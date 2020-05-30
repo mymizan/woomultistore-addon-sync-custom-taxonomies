@@ -1,16 +1,16 @@
 <?php
 /**
- * Plugin Name: WooCommerce Multistore Sync Custom Field
+ * Plugin Name: WooCommerce Multistore Sync Custom Taxonomies
  * Plugin URI: https://woomultistore.com
- * Description: Compatibility addon for syncing custom fields by WooCommerce Multistore 
+ * Description: Compatibility addon for syncing custom taxonomies by WooCommerce Multistore 
  * Author: WooCommerce Multistore
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author URI: https://woomultistore.com/
  **/
 
 
-define( 'WOOMULTI_PLUGIN_NAME', 'WooCommerce Multistore Sync Custom Field' );
-define( 'WOOMULTI_PLUGIN_VERSION', '1.0.0' );
+define( 'WOOMULTI_PLUGIN_NAME', 'WooCommerce Multistore Sync Custom Taxonomies' );
+define( 'WOOMULTI_PLUGIN_VERSION', '1.0.1' );
 
 class WOOMULTI_ADDON_CUSTOM_TAXONOMIES {
 
@@ -20,7 +20,12 @@ class WOOMULTI_ADDON_CUSTOM_TAXONOMIES {
 	);
 
 	public function __construct() {
-		add_action('WOO_MSTORE_admin_product/slave_product_updated', array($this, 'sync_custom_taxonomies'), 10, 1);
+		if ( is_mulisite() ) {
+			add_action('WOO_MSTORE_admin_product/slave_product_updated', array($this, 'sync_custom_taxonomies'), 10, 1);	
+		} else {
+			// Regular WordPress support
+		}
+		
 	}
 
 	public function sync_custom_taxonomies( $data ) {
