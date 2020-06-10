@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: WooCommerce Multistore Sync Custom Taxonomies
+ * Plugin Name: WooMultistore Sync Custom Taxonomies
  * Plugin URI: https://woomultistore.com
- * Description: Compatibility addon for syncing custom taxonomies by WooCommerce Multistore 
+ * Description: Compatibility addon for syncing custom taxonomies by WooCommerce Multistore
  * Author: WooCommerce Multistore
  * Version: 1.0.1
  * Author URI: https://woomultistore.com/
@@ -15,15 +15,24 @@ define( 'WOOMULTI_PLUGIN_VERSION', '1.0.1' );
 class WOOMULTI_ADDON_CUSTOM_TAXONOMIES {
 
 	/**
-	 * NOTE: Add your taxonomy slugs here. Do you change anything else, unless you know what you are doing.
+	 * ***************************************************************************************************
+	 * ***************************************************************************************************
+	 * ***************************************************************************************************
+	 * ***************************************************************************************************
+	 *  Add your taxonomy slugs here. Do you change anything else, unless you know what you are doing.
+	 * ***************************************************************************************************
+	 * ***************************************************************************************************
+	 * ***************************************************************************************************
+	 * ***************************************************************************************************
 	 */
 	public $taxonomies = array(
 		'brand', // remove this and add yours.
+		'brands', // remove this and add yours.
 	);
 
 	public function __construct() {
 		if ( is_multisite() ) {
-			add_action('WOO_MSTORE_admin_product/slave_product_updated', array($this, 'sync_custom_taxonomies'), 10, 1);	
+			add_action( 'WOO_MSTORE_admin_product/slave_product_updated', array( $this, 'sync_custom_taxonomies' ), 10, 1 );
 		} else {
 			// Regular WordPress support
 			// Add ACF fields to product JSON.
@@ -33,10 +42,10 @@ class WOOMULTI_ADDON_CUSTOM_TAXONOMIES {
 	}
 
 	public function add_taxonomy_terms( $product, $wc_product, $product_id ) {
-		$custom_tax = array(); 
+		$custom_tax = array();
 
 		foreach ( $this->taxonomies as $tax ) {
-			$_terms = get_the_terms( $product_id, $tax);
+			$_terms              = get_the_terms( $product_id, $tax );
 			$custom_tax [ $tax ] = array();
 
 			foreach ( $_terms as $trm ) {
@@ -51,12 +60,12 @@ class WOOMULTI_ADDON_CUSTOM_TAXONOMIES {
 	}
 
 	public function sync_taxonomy_terms( $wc_product_id, $parent_id, $product ) {
-		if ( empty($product['custom_taxonomies']) ) {
+		if ( empty( $product['custom_taxonomies'] ) ) {
 			return;
 		}
 
 		foreach ( $product['custom_taxonomies'] as $tax => $terms ) {
-			wp_set_object_terms($wc_product_id, $terms, $tax);
+			wp_set_object_terms( $wc_product_id, $terms, $tax );
 		}
 	}
 
@@ -70,19 +79,18 @@ class WOOMULTI_ADDON_CUSTOM_TAXONOMIES {
 			$slave_blog_id = get_current_blog_id();
 			restore_current_blog();
 
-			//get the terms from parent
-			$_terms = get_the_terms( $data['master_product']->get_id(),  $tax);
+			// get the terms from parent
+			$_terms = get_the_terms( $data['master_product']->get_id(), $tax );
 
-
-			if ( !empty($_terms) ) {
+			if ( ! empty( $_terms ) ) {
 				foreach ( $_terms as $trm ) {
 					$terms_to_sync[] = $trm->name;
 				}
 			}
-			
+
 			switch_to_blog( $slave_blog_id );
 
-			wp_set_object_terms($data['slave_product']->get_id(), $terms_to_sync, $tax);
+			wp_set_object_terms( $data['slave_product']->get_id(), $terms_to_sync, $tax );
 		}
 	}
 
